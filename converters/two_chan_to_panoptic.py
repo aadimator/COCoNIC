@@ -137,29 +137,29 @@ def converter(source_folder, images_json_file, categories_json_file,
     print("Time elapsed: {:0.2f} seconds".format(t_delta))
 
 
-# if __name__ == "__main__":
-#     parser = argparse.ArgumentParser(
-#         description="This script converts panoptic segmentation predictions \
-#         stored in 2 channels panoptic format to COCO panoptic format. See this \
-#         file's head for more information."
-#     )
-#     parser.add_argument('--source_folder', type=str,
-#                         help="folder that contains predictions in 2 channels PNG format")
-#     parser.add_argument('--images_json_file', type=str,
-#                         help="JSON file with correponding image set information")
-#     parser.add_argument('--categories_json_file', type=str,
-#                         help="JSON file with Panoptic COCO categories information",
-#                         default='./panoptic_coco_categories.json')
-#     parser.add_argument(
-#         '--segmentations_folder', type=str, default=None, help="Folder with \
-#          panoptic COCO format segmentations. Default: X if input_json_file is \
-#          X.json"
-#     )
-#     parser.add_argument('--predictions_json_file', type=str,
-#                         help="JSON file with resulting COCO format prediction")
-#     parser.add_argument('-v', '--void', type=int, default=0,
-#                         help="semantic id that corresponds to VOID region in two channels PNG format")
-#     args = parser.parse_args()
-#     converter(args.source_folder, args.images_json_file, args.categories_json_file,
-#               args.segmentations_folder, args.predictions_json_file,
-#               args.void)
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(
+        description="This script converts panoptic segmentation predictions \
+        stored in 2 channels panoptic format to COCO panoptic format. See this \
+        file's head for more information."
+    )
+    parser.add_argument('--source_folder', type=str,
+                        help="folder that contains predictions in 2 channels PNG format")
+    parser.add_argument('--images_json_file', type=str,
+                        help="JSON file with correponding image set information")
+    parser.add_argument('--categories_json_file', type=str,
+                        help="JSON file with Panoptic COCO categories information",
+                        default='./panoptic_coco_categories.json')
+    parser.add_argument(
+        '--segmentations_folder', type=str, default=None, help="Folder with \
+         panoptic COCO format segmentations. Default: X if input_json_file is \
+         X.json"
+    )
+    parser.add_argument('--predictions_json_file', type=str,
+                        help="JSON file with resulting COCO format prediction")
+    parser.add_argument('-v', '--void', type=int, default=0,
+                        help="semantic id that corresponds to VOID region in two channels PNG format")
+    args = parser.parse_args()
+    converter(args.source_folder, args.images_json_file, args.categories_json_file,
+              args.segmentations_folder, args.predictions_json_file,
+              args.void)
