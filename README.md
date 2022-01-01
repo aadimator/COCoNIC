@@ -1,6 +1,6 @@
 # COCoNIC
 
-[![Kaggle](https://kaggle.com/static/images/open-in-kaggle.svg)] (https://www.kaggle.com/aadimator/coconic)
+[![Kaggle](https://kaggle.com/static/images/open-in-kaggle.svg)](https://www.kaggle.com/aadimator/coconic)
 
 Converts the CoNIC data fromat into [COCO format](https://cocodataset.org/#format-data).
 
