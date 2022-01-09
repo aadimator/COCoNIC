@@ -101,21 +101,21 @@ def convert_panoptic_to_detection_coco_format(input_json_file,
         categories_list = json.load(f)
     categories = {category['id']: category for category in categories_list}
 
-    # cpu_num = multiprocessing.cpu_count()
-    # annotations_split = np.array_split(annotations_panoptic, cpu_num)
-    # print("Number of cores: {}, images per core: {}".format(cpu_num, len(annotations_split[0])))
-    # workers = multiprocessing.Pool(processes=cpu_num)
-    # processes = []
-    # for proc_id, annotations_set in enumerate(annotations_split):
-    #     p = workers.apply_async(convert_panoptic_to_detection_coco_format_single_core,
-    #                             (proc_id, annotations_set, categories, segmentations_folder, things_only))
-    #     processes.append(p)
-    # annotations_coco_detection = []
-    # for p in processes:
-    #     annotations_coco_detection.extend(p.get())
+    cpu_num = multiprocessing.cpu_count()
+    annotations_split = np.array_split(annotations_panoptic, cpu_num)
+    print("Number of cores: {}, images per core: {}".format(cpu_num, len(annotations_split[0])))
+    workers = multiprocessing.Pool(processes=cpu_num)
+    processes = []
+    for proc_id, annotations_set in enumerate(annotations_split):
+        p = workers.apply_async(convert_panoptic_to_detection_coco_format_single_core,
+                                (proc_id, annotations_set, categories, segmentations_folder, things_only))
+        processes.append(p)
+    annotations_coco_detection = []
+    for p in processes:
+        annotations_coco_detection.extend(p.get())
 
-    annotations_coco_detection = convert_panoptic_to_detection_coco_format_single_core(
-        0, annotations_panoptic, categories, segmentations_folder, things_only)
+    # annotations_coco_detection = convert_panoptic_to_detection_coco_format_single_core(
+    #     0, annotations_panoptic, categories, segmentations_folder, things_only)
     for idx, ann in enumerate(annotations_coco_detection):
         ann['id'] = idx
 

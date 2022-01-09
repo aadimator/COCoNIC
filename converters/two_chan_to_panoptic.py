@@ -32,6 +32,14 @@ import PIL.Image as Image
 
 from .utils import get_traceback, IdGenerator, save_json
 
+try:
+    # set up path for pycocotools
+    # sys.path.append('./cocoapi-master/PythonAPI/')
+    from pycocotools import mask as COCOmask
+except Exception:
+    raise Exception(
+        "Please install pycocotools module from https://github.com/cocodataset/cocoapi")
+
 OFFSET = 1000
 
 
@@ -68,8 +76,14 @@ def convert_single_core(proc_id, image_set, categories, source_folder, segmentat
             mask = pan == el
             segment_id, color = id_generator.get_id_and_color(sem)
             pan_format[mask] = color
+            mask = np.expand_dims(mask.astype(np.uint8), axis=2)
+            rle = COCOmask.encode(np.asfortranarray(mask))[0]
+            area = COCOmask.area(rle)
+            bbox = COCOmask.toBbox(rle)
             segm_info.append({"id": segment_id,
                               "iscrowd": 0,
+                              "bbox": bbox.tolist(),
+                              "area": area.tolist(),
                               "category_id": int(sem)})
 
         annotations.append({'image_id': image_info['id'],
@@ -113,21 +127,21 @@ def converter(source_folder, images_json_file, categories_json_file,
     print("\tSegmentation folder: {}".format(segmentations_folder))
     print("\tJSON file: {}".format(predictions_json_file))
     print('\n')
-    # cpu_num = multiprocessing.cpu_count()
-    # images_split = np.array_split(images, cpu_num)
-    # print("Number of cores: {}, images per core: {}".format(cpu_num, len(images_split[0])))
-    # workers = multiprocessing.Pool(processes=cpu_num)
-    # processes = []
-    # for proc_id, image_set in enumerate(images_split):
-    #     print(f"{proc_id}: {len(image_set)}")
-    #     p = workers.apply_async(convert_single_core,
-    #                             (proc_id, image_set, categories, source_folder, segmentations_folder, VOID))
-    #     processes.append(p)
-    annotations = convert_single_core(
-        0, images, categories, source_folder, segmentations_folder, VOID)
-    # annotations = []
-    # for p in processes:
-    #     annotations.extend(p.get())
+    cpu_num = multiprocessing.cpu_count()
+    images_split = np.array_split(images, cpu_num)
+    print("Number of cores: {}, images per core: {}".format(cpu_num, len(images_split[0])))
+    workers = multiprocessing.Pool(processes=cpu_num)
+    processes = []
+    for proc_id, image_set in enumerate(images_split):
+        print(f"{proc_id}: {len(image_set)}")
+        p = workers.apply_async(convert_single_core,
+                                (proc_id, image_set, categories, source_folder, segmentations_folder, VOID))
+        processes.append(p)
+    # annotations = convert_single_core(
+    #     0, images, categories, source_folder, segmentations_folder, VOID)
+    annotations = []
+    for p in processes:
+        annotations.extend(p.get())
 
     print("Writing final JSON in {}".format(predictions_json_file))
     d_coco['annotations'] = annotations
